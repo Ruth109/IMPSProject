@@ -6,7 +6,10 @@
         <div class="col-md-4">
             <form action="/carreras/modificar/{{carrera.idcarrera}}"  method="POST">
                 <div class="form-group">
-                    <input type="text" class="form-control" name="carrera" placeholder="Nombre de la carrera" value="{{carrera.carrera}}" autofocus />
+                    <input type="text" class="form-control" name="idcarrera" placeholder="Codigo de la carrera" value="{{carrera.idcarrera}}" autofocus />
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="carrera" placeholder="Nombre de la carrera" value="{{carrera.carrera}}" />
                 </div>
                 <div class="form-group">
                     <button class="btn btn-success btn-block">Guardar cambios</button>

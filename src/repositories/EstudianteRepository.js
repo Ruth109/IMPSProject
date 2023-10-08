@@ -49,7 +49,7 @@ module.exports = {
                 return result[0];
             } else {
                 return null;
-            } (result.affectedRows > 0)
+            }
         } catch (error) {
             console.error('Error al obtener el registro', error);
         }

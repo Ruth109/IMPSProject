@@ -45,14 +45,10 @@ module.exports = {
     //Obtener una carrera por su ID
     obtenerCarreraPorId: async (idcarrera) => {
         try {
-            const result = await pool.query('SELECT * FROM carreras WHERE idcarrera = ?', [idcarrera]);
-            if (result.length > 0) {
-                return result[0];
-            } else {
-                return null;
-            }
+            const [carrera] = await pool.query('SELECT * FROM carreras WHERE idcarrera = ?', [idcarrera]);
+            return carrera;
         } catch (error) {
-            console.error('Error al obtener el registro', error);
+            console.log('Error al obtener el registro');
         }
     }
 }

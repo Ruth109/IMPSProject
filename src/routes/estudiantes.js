@@ -45,19 +45,19 @@ router.get('/modificar/:idestudiante', async (request, response) => {
     if(estudiante){
         const lstCarreras = await carrerasQuery.obtenerTodasLasCarreras();    
         // Renderizamos el formulario
-        response.render('estudiantes/modificar', {estudiante, lstCarreras});
+        response.render('estudiantes/modificar', {lstCarreras, idestudiante, estudiante});
     }else{
         response.redirect('/estudiantes');
     }
 });
 
 // Endpoint para actualizar un estudiante
-router.post('/modificar/:idestudiante', async (request, response) => {
-    const {idestudiante} = request.params;
-    const {nombre, apellido, email, idcarrera, usuario} = request.body;
-    const datosActualizados = {nombre, apellido, email, idcarrera, usuario};
+router.post('/modificar/:id', async (request, response) => {
+    const {id} = request.params;
+    const {idestudiante, nombre, apellido, email, idcarrera, usuario} = request.body;
+    const datosActualizados = {idestudiante, nombre, apellido, email, idcarrera, usuario};
 
-    const resultado = await queries.actualizarEstudiante(idestudiante, datosActualizados);
+    const resultado = await queries.actualizarEstudiante(id, datosActualizados);
     
     if(resultado){
         console.log('Estudiante actualizado con exito');

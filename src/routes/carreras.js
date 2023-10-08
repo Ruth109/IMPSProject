@@ -6,7 +6,7 @@ const queries = require('../repositories/CarreraRepository');
 router.get('/', async (request, response) => {
     const carreras = await queries.obtenerTodasLasCarreras();
 
-    response.render('carreras/listado', {carreras}); // Mostramos el listado de carreras
+    response.render('carreras/listado', {carreras: carreras}); // Mostramos el listado de carreras
 });
 
 // Endpoint que permite mostrar el formulario para agregar una nueva carrera
@@ -26,7 +26,7 @@ router.post('/agregar', async (request, response) => {
 
 // Endpoint que permite eliminar un estudiante
 router.get('/eliminar/:idcarrera', async (request, response) => {
-    // Desestructuramos el objeto que nos mandan en la peticion y extraemos el idestudiante
+    // Desestructuramos el objeto que nos mandan en la peticion y extraemos el idcarrera
     const { idcarrera } = request.params;
     const resultado = await queries.eliminarCarrera(idcarrera);
     if (resultado > 0) {
@@ -35,34 +35,28 @@ router.get('/eliminar/:idcarrera', async (request, response) => {
     response.redirect('/carreras');
 });
 
-// Endpoint que permite mostrar el formulario para modificar un estudiante
+// Endpoint que permite mostrar el formulario para modificar una carrera
 router.get('/modificar/:idcarrera', async (request, response) => {
     const {idcarrera} = request.params;
     const carrera = await queries.obtenerCarreraPorId(idcarrera);
 
     if(carrera){   
         // Renderizamos el formulario
-        response.render('carreras/modificar', {carrera});
+        response.render('carreras/modificar', {idcarrera, carrera});
     }else{
         response.redirect('/carreras');
     }
 });
 
-// Endpoint para actualizar un estudiante
-router.post('/modificar/:idcarrera', async (request, response) => {
-    const {idcarrera} = request.params;
-    const {carrera} = request.body;
-    const datosActualizados = {carrera};
+// Endpoint para actualizar una carrera
+router.post('/modificar/:id', async (request, response) => {
+    const {id} = request.params;
+    const {idcarrera, carrera} = request.body;
+    const datosActualizados = {idcarrera, carrera};
 
-    const resultado = await queries.actualizarCarrera(idcarrera, datosActualizados);
+    const resultado = await queries.actualizarCarrera(id, datosActualizados);
     
-    if(resultado){
-        console.log('Carrera actualizada con exito');
-        response.redirect('/carreras');
-    }else{
-        console.log('Error al actualizar la carrera');
-        response.redirect('/carreras/modificar/' + idcarrera);
-    }
+    response.redirect('/carreras');
 });
 
 module.exports = router;

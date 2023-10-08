@@ -6,7 +6,10 @@
         <div class="col-md-4">
             <form action="/estudiantes/modificar/{{estudiante.idestudiante}}"  method="POST">
                 <div class="form-group">
-                    <input type="text" class="form-control" name="nombre" placeholder="Nombre del estudiante" value="{{estudiante.nombre}}" autofocus />
+                    <input type="text" class="form-control" name="idestudiante" placeholder="Codigo del estudiante" value="{{estudiante.idestudiante}}" autofocus />
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="nombre" placeholder="Nombre del estudiante" value="{{estudiante.nombre}}" />
                 </div>
                 <div class="form-group">
                     <input type="text" class="form-control" name="apellido" placeholder="Apellido del estudiante" value="{{estudiante.apellido}}" />
@@ -17,7 +20,7 @@
                 <div class="form-group">
                     <select class="form-control" name="idcarrera">
                         {{#each lstCarreras}}
-                        <option value="{{idcarrera}}" {{#if (eq idcarrera estudiante.idcarrera)}} selected{{/if}}>{{carrera}}</option>
+                        <option value="{{idcarrera}}" {{#eq idcarrera ../estudiante.idcarrera}}selected{{/eq}}>{{carrera}}</option>
                         {{/each}}
                     </select>
                 </div>

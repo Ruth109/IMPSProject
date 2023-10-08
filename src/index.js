@@ -2,12 +2,6 @@ const express = require('express');
 const morgan = require('morgan');
 const exphbs = require('express-handlebars'); // Necesario para utilizar el motor de plantillas handlebars
 const path = require('path');
-const handlebars = require('handlebars'); // Importa la biblioteca Handlebars
-
-// Define el helper eq en Handlebars
-handlebars.registerHelper('eq', function (a, b, options) {
-    return a === b ? options.fn(this) : '';
-});
 
 // Inicializaciones
 const app = express();
@@ -19,7 +13,9 @@ app.set('views', path.join(__dirname, 'views')); // Configuracion de la ruta don
 app.engine('.hbs', exphbs.engine({
     defaultLayout: 'main', // Configuracion del layout principal
     layoutsDir: path.join(app.get('views'), 'layouts'), // Configuracion de la ruta de los layouts
-    extname: '.hbs' // Configura la extensión que tendran los archivos HandleBars
+    partialsDir: path.join(app.get('views'), 'partials'), // Configuracion de vistas parciales
+    extname: '.hbs', // Configura la extensión que tendran los archivos HandleBars
+    helpers: require('./lib/handlebars') // Configuracion de funciones
 }));
 
 app.set('view engine', '.hbs'); // Configuracion para ejecutar el motor de plantillas
