@@ -17,8 +17,8 @@ router.get('/agregar', async (request, response) => {
 
 // Endpoint para agregar un profesor
 router.post('/agregar', async (request, response) => {
-    const {idprofesor, nombre, apellido, fecha_nacimiento, profesion, genero, email} = request.body;
-    const nuevoProfesor = {idprofesor, nombre, apellido, fecha_nacimiento, profesion, genero, email};
+    const {nombre, apellido, fecha_nacimiento, profesion, genero, email} = request.body;
+    const nuevoProfesor = {nombre, apellido, fecha_nacimiento, profesion, genero, email};
 
     const resultado = await queries.insertarProfesor(nuevoProfesor);
     response.redirect('/profesores');
@@ -49,12 +49,12 @@ router.get('/modificar/:idprofesor', async (request, response) => {
 });
 
 // Endpoint para actualizar un profesor
-router.post('/modificar/:id', async (request, response) => {
-    const {id} = request.params;
-    const {idprofesor, nombre, apellido, fecha_nacimiento, profesion, genero, email} = request.body;
-    const datosActualizados = {idprofesor, nombre, apellido, fecha_nacimiento, profesion, genero, email};
+router.post('/modificar/:idprofesor', async (request, response) => {
+    const {idprofesor} = request.params;
+    const {nombre, apellido, fecha_nacimiento, profesion, genero, email} = request.body;
+    const datosActualizados = {nombre, apellido, fecha_nacimiento, profesion, genero, email};
 
-    const resultado = await queries.actualizarProfesor(id, datosActualizados);
+    const resultado = await queries.actualizarProfesor(idprofesor, datosActualizados);
     
     if(resultado){
         console.log('Profesor actualizado con exito');

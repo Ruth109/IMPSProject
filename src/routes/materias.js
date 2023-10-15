@@ -17,8 +17,8 @@ router.get('/agregar', async (request, response) => {
 
 // Endpoint para agregar una materia
 router.post('/agregar', async (request, response) => {
-    const {idmateria, materia} = request.body;
-    const nuevaMateria = {idmateria, materia};
+    const {materia} = request.body;
+    const nuevaMateria = {materia};
 
     const resultado = await queries.insertarMateria(nuevaMateria);
     response.redirect('/materias');
@@ -49,12 +49,12 @@ router.get('/modificar/:idmateria', async (request, response) => {
 });
 
 // Endpoint para actualizar una materia
-router.post('/modificar/:id', async (request, response) => {
-    const {id} = request.params;
-    const {idmateria, materia} = request.body;
-    const datosActualizados = {idmateria, materia};
+router.post('/modificar/:idmateria', async (request, response) => {
+    const {idmateria} = request.params;
+    const {materia} = request.body;
+    const datosActualizados = {materia};
 
-    const resultado = await queries.actualizarMateria(id, datosActualizados);
+    const resultado = await queries.actualizarMateria(idmateria, datosActualizados);
     
     if(resultado){
         console.log('Materia actualizado con exito');
