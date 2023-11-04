@@ -8,7 +8,7 @@ const profesoresQuery = require('../repositories/ProfesorRepository');
 router.get('/', async (request, response) => {
     const grupos = await queries.obtenerTodosLosGrupos();
 
-    response.render('grupos/listado', {grupos}); // Mostramos el listado de grupos
+    response.render('grupos/listado', { grupos }); // Mostramos el listado de grupos
 });
 
 // Endpoint que permite mostrar el formulario para agregar un nuevo grupo
@@ -17,15 +17,22 @@ router.get('/agregar', async (request, response) => {
     const lstProfesores = await profesoresQuery.obtenerTodosLosProfesores();
 
     // Renderizamos el formulario
-    response.render('grupos/agregar', {lstMaterias, lstProfesores});
+    response.render('grupos/agregar', { lstMaterias, lstProfesores });
 });
 
 // Endpoint para agregar un grupo
 router.post('/agregar', async (request, response) => {
-    const {num_grupo, anio, ciclo, idmateria, idprofesor} = request.body;
-    const nuevoGrupo = {num_grupo, anio, ciclo, idmateria, idprofesor};
+    const { num_grupo, anio, ciclo, idmateria, idprofesor } = request.body;
+    const nuevoGrupo = { num_grupo, anio, ciclo, idmateria, idprofesor };
 
     const resultado = await queries.insertarGrupo(nuevoGrupo);
+
+    if (resultado) {
+        request.flash('success', 'Registro insertado con exito');
+    } else {
+        request.flash('error', 'Ocurrio un problema al guardar el registro');
+    }
+
     response.redirect('/grupos');
 });
 
@@ -35,41 +42,91 @@ router.get('/eliminar/:idgrupo', async (request, response) => {
     const { idgrupo } = request.params;
     const resultado = await queries.eliminarGrupo(idgrupo);
     if (resultado > 0) {
-        console.log('Eliminado con éxito');
+        request.flash('success', 'Eliminacion correcta');
+    } else {
+        request.flash('error', 'Error al eliminar');
     }
     response.redirect('/grupos');
 });
 
 // Endpoint que permite mostrar el formulario para modificar un grupo
 router.get('/modificar/:idgrupo', async (request, response) => {
-    const {idgrupo} = request.params;
+    const { idgrupo } = request.params;
     const grupo = await queries.obtenerGrupoPorId(idgrupo);
 
-    if(grupo){
+    if (grupo) {
         const lstMaterias = await materiasQuery.obtenerTodasLasMaterias();
-        const lstProfesores = await profesoresQuery.obtenerTodosLosProfesores();    
+        const lstProfesores = await profesoresQuery.obtenerTodosLosProfesores();
         // Renderizamos el formulario
-        response.render('grupos/modificar', {lstMaterias, lstProfesores, idgrupo, grupo});
-    }else{
+        response.render('grupos/modificar', { lstMaterias, lstProfesores, idgrupo, grupo });
+    } else {
         response.redirect('/grupos');
     }
 });
 
 // Endpoint para actualizar un estudiante
 router.post('/modificar/:idgrupo', async (request, response) => {
-    const {idgrupo} = request.params;
-    const {num_grupo, anio, ciclo, idmateria, idprofesor} = request.body;
-    const datosActualizados = {num_grupo, anio, ciclo, idmateria, idprofesor};
+    const { idgrupo } = request.params;
+    const { num_grupo, anio, ciclo, idmateria, idprofesor } = request.body;
+    const datosActualizados = { num_grupo, anio, ciclo, idmateria, idprofesor };
 
     const resultado = await queries.actualizarGrupo(idgrupo, datosActualizados);
-    
-    if(resultado){
-        console.log('Grupo actualizado con exito');
+
+    if (resultado) {
+        request.flash('success', 'Registro actualizado con exito');
         response.redirect('/grupos');
-    }else{
-        console.log('Error al actualizar el grupo');
+    } else {
+        request.flash('error', 'Ocurrio un problema al actualizar el registro');
         response.redirect('/grupos/modificar/' + idgrupo);
     }
 });
+
+// Enpoint que permite navegar a la pantalla para asignar un grupo
+router.get('/asignargrupo/:idgrupo', async (request, reponse) => {
+    const { idgrupo } = request.params;
+    // Consultamos el listado de estudiantes disponible
+    const lstEstudiantes = await estudiantesQuery.obtenerTodosLosEstudiantes();
+    reponse.render('grupos/asignargrupo', { lstEstudiantes, idgrupo });
+});
+// Endpoint que permite asignar un grupo
+router.post('/asignargrupo', async (request, response) => {
+    const data = request.body;
+    let resultado = null;
+    const result = processDataFromForm(data);
+    for (const tmp of result.grupo_estudiantes) {
+        //const asignacion = [tmp.idgrupo, tmp.idestudiante];
+        //const { idgrupo, idestudiante } = tmp;
+        //const asignacionObj = {idgrupo, idestudiante};
+        resultado = await queries.asignarGrupo(tmp);
+    }
+    if (resultado) {
+        request.flash('success', 'Asignacion de grupo realizada con exito');
+    } else {
+        request.flash('error', 'Ocurrio un problema al realizar asignacion');
+    }
+    response.redirect('/grupos');
+});
+// Función para procesar los datos del formulario
+function processDataFromForm(data) {
+    const result = {
+        grupo_estudiantes: []
+    };
+    for (const key in data) {
+        if (key.startsWith('grupo_estudiantes[')) {
+            const match = key.match(/\[(\d+)\]\[(\w+)\]/);
+            if (match) {
+                const index = parseInt(match[1]);
+                const property = match[2];
+                if (!result.grupo_estudiantes[index]) {
+                    result.grupo_estudiantes[index] = {};
+                }
+                result.grupo_estudiantes[index][property] = data[key];
+            }
+        } else {
+            result[key] = data[key];
+        }
+    }
+    return result;
+}
 
 module.exports = router;

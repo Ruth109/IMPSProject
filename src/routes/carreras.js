@@ -6,7 +6,7 @@ const queries = require('../repositories/CarreraRepository');
 router.get('/', async (request, response) => {
     const carreras = await queries.obtenerTodasLasCarreras();
 
-    response.render('carreras/listado', {carreras: carreras}); // Mostramos el listado de carreras
+    response.render('carreras/listado', { carreras: carreras }); // Mostramos el listado de carreras
 });
 
 // Endpoint que permite mostrar el formulario para agregar una nueva carrera
@@ -17,10 +17,17 @@ router.get('/agregar', async (request, response) => {
 
 // Endpoint para agregar una carrera
 router.post('/agregar', async (request, response) => {
-    const {idcarrera, carrera} = request.body;
-    const nuevaCarrera = {idcarrera, carrera};
+    const { idcarrera, carrera } = request.body;
+    const nuevaCarrera = { idcarrera, carrera };
 
     const resultado = await queries.insertarCarrera(nuevaCarrera);
+
+    if (resultado) {
+        request.flash('success', 'Registro insertado con exito');
+    } else {
+        request.flash('error', 'Ocurrio un problema al guardar el registro');
+    }
+
     response.redirect('/carreras');
 });
 
@@ -30,32 +37,40 @@ router.get('/eliminar/:idcarrera', async (request, response) => {
     const { idcarrera } = request.params;
     const resultado = await queries.eliminarCarrera(idcarrera);
     if (resultado > 0) {
-        console.log('Eliminado con éxito');
+        request.flash('success', 'Eliminacion correcta');
+    } else {
+        request.flash('error', 'Error al eliminar');
     }
     response.redirect('/carreras');
 });
 
 // Endpoint que permite mostrar el formulario para modificar una carrera
 router.get('/modificar/:idcarrera', async (request, response) => {
-    const {idcarrera} = request.params;
+    const { idcarrera } = request.params;
     const carrera = await queries.obtenerCarreraPorId(idcarrera);
 
-    if(carrera){   
+    if (carrera) {
         // Renderizamos el formulario
-        response.render('carreras/modificar', {idcarrera, carrera});
-    }else{
+        response.render('carreras/modificar', { idcarrera, carrera });
+    } else {
         response.redirect('/carreras');
     }
 });
 
 // Endpoint para actualizar una carrera
 router.post('/modificar/:id', async (request, response) => {
-    const {id} = request.params;
-    const {idcarrera, carrera} = request.body;
-    const datosActualizados = {idcarrera, carrera};
+    const { id } = request.params;
+    const { idcarrera, carrera } = request.body;
+    const datosActualizados = { idcarrera, carrera };
 
     const resultado = await queries.actualizarCarrera(id, datosActualizados);
     
+    if (resultado) {
+        request.flash('success', 'Registro actualizado con exito');
+    } else {
+        request.flash('error', 'Ocurrio un problema al actualizar el registro');
+    }
+
     response.redirect('/carreras');
 });
 

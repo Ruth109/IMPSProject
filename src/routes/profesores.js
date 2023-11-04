@@ -6,7 +6,7 @@ const queries = require('../repositories/ProfesorRepository');
 router.get('/', async (request, response) => {
     const profesores = await queries.obtenerTodosLosProfesores();
 
-    response.render('profesores/listado', {profesores}); // Mostramos el listado de profesores
+    response.render('profesores/listado', { profesores }); // Mostramos el listado de profesores
 });
 
 // Endpoint que permite mostrar el formulario para agregar un nuevo profesor
@@ -17,10 +17,17 @@ router.get('/agregar', async (request, response) => {
 
 // Endpoint para agregar un profesor
 router.post('/agregar', async (request, response) => {
-    const {nombre, apellido, fecha_nacimiento, profesion, genero, email} = request.body;
-    const nuevoProfesor = {nombre, apellido, fecha_nacimiento, profesion, genero, email};
+    const { nombre, apellido, fecha_nacimiento, profesion, genero, email } = request.body;
+    const nuevoProfesor = { nombre, apellido, fecha_nacimiento, profesion, genero, email };
 
     const resultado = await queries.insertarProfesor(nuevoProfesor);
+
+    if (resultado) {
+        request.flash('success', 'Registro insertado con exito');
+    } else {
+        request.flash('error', 'Ocurrio un problema al guardar el registro');
+    }
+
     response.redirect('/profesores');
 });
 
@@ -30,37 +37,39 @@ router.get('/eliminar/:idprofesor', async (request, response) => {
     const { idprofesor } = request.params;
     const resultado = await queries.eliminarProfesor(idprofesor);
     if (resultado > 0) {
-        console.log('Eliminado con éxito');
+        request.flash('success', 'Eliminacion correcta');
+    } else {
+        request.flash('error', 'Error al eliminar');
     }
     response.redirect('/profesores');
 });
 
 // Endpoint que permite mostrar el formulario para modificar un profesor
 router.get('/modificar/:idprofesor', async (request, response) => {
-    const {idprofesor} = request.params;
+    const { idprofesor } = request.params;
     const profesor = await queries.obtenerProfesorPorId(idprofesor);
 
-    if(profesor){
+    if (profesor) {
         // Renderizamos el formulario
-        response.render('profesores/modificar', {idprofesor, profesor});
-    }else{
+        response.render('profesores/modificar', { idprofesor, profesor });
+    } else {
         response.redirect('/profesores');
     }
 });
 
 // Endpoint para actualizar un profesor
 router.post('/modificar/:idprofesor', async (request, response) => {
-    const {idprofesor} = request.params;
-    const {nombre, apellido, fecha_nacimiento, profesion, genero, email} = request.body;
-    const datosActualizados = {nombre, apellido, fecha_nacimiento, profesion, genero, email};
+    const { idprofesor } = request.params;
+    const { nombre, apellido, fecha_nacimiento, profesion, genero, email } = request.body;
+    const datosActualizados = { nombre, apellido, fecha_nacimiento, profesion, genero, email };
 
     const resultado = await queries.actualizarProfesor(idprofesor, datosActualizados);
-    
-    if(resultado){
-        console.log('Profesor actualizado con exito');
+
+    if (resultado) {
+        request.flash('success', 'Registro actualizado con exito');
         response.redirect('/profesores');
-    }else{
-        console.log('Error al actualizar el profesor');
+    } else {
+        request.flash('error', 'Ocurrio un problema al actualizar el registro');
         response.redirect('/profesores/modificar/' + idprofesor);
     }
 });
