@@ -1,22 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const queries = require('../repositories/MateriaRepository');
+const { isLoggedIn } = require('../lib/auth');
 
 // Endpoint para mostrar todos las materias 
-router.get('/', async (request, response) => {
+router.get('/', isLoggedIn, async (request, response) => {
     const materias = await queries.obtenerTodasLasMaterias();
 
     response.render('materias/listado', { materias }); // Mostramos el listado de materias
 });
 
 // Endpoint que permite mostrar el formulario para agregar una nueva materia
-router.get('/agregar', async (request, response) => {
+router.get('/agregar', isLoggedIn, async (request, response) => {
     // Renderizamos el formulario
     response.render('materias/agregar');
 });
 
 // Endpoint para agregar una materia
-router.post('/agregar', async (request, response) => {
+router.post('/agregar', isLoggedIn, async (request, response) => {
     const { materia } = request.body;
     const nuevaMateria = { materia };
 
@@ -32,7 +33,7 @@ router.post('/agregar', async (request, response) => {
 });
 
 // Endpoint que permite eliminar una materia
-router.get('/eliminar/:idmateria', async (request, response) => {
+router.get('/eliminar/:idmateria', isLoggedIn, async (request, response) => {
     // Desestructuramos el objeto que nos mandan en la peticion y extraemos el idmateria
     const { idmateria } = request.params;
     const resultado = await queries.eliminarMateria(idmateria);
@@ -45,7 +46,7 @@ router.get('/eliminar/:idmateria', async (request, response) => {
 });
 
 // Endpoint que permite mostrar el formulario para modificar una materia
-router.get('/modificar/:idmateria', async (request, response) => {
+router.get('/modificar/:idmateria', isLoggedIn, async (request, response) => {
     const { idmateria } = request.params;
     const materia = await queries.obtenerMateriaPorId(idmateria);
 
@@ -58,7 +59,7 @@ router.get('/modificar/:idmateria', async (request, response) => {
 });
 
 // Endpoint para actualizar una materia
-router.post('/modificar/:idmateria', async (request, response) => {
+router.post('/modificar/:idmateria', isLoggedIn, async (request, response) => {
     const { idmateria } = request.params;
     const { materia } = request.body;
     const datosActualizados = { materia };
